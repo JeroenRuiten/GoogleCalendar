@@ -10,19 +10,22 @@ function GetJson() {
     //read from cache, not older than one day
     if(!file_exists($filename) || (time() - (24 * 60 * 60)) > filemtime($filename)) {
         $jsonData = file_get_contents($apiUrl);
+        
+        //put date in json
+        $data = json_decode($jsonData);
+        foreach ($data->items as $event) {
+            if ($event->start->dateTime) $event->start->date = date('Y-m-d', strtotime($event->start->dateTime));
+            if ($event->end->dateTime) $event->end->date = date('Y-m-d', strtotime($event->end->dateTime));
+        }
+        $jsonData = json_encode($data);
+        
         file_put_contents($filename, $jsonData);
+        
     } else {
         $jsonData = file_get_contents($filename);
     }
     
-    //json => object and put date to every object
-    $data = json_decode($jsonData);
-    foreach ($data->items as $event) {
-        if ($event->start->dateTime) $event->start->date = date('Y-m-d', strtotime($event->start->dateTime));
-        if ($event->end->dateTime) $event->end->date = date('Y-m-d', strtotime($event->end->dateTime));
-    }
-    
-    return $data;
+    return json_decode($jsonData);
 }//GetJson
 
 function CacheStaticMaps($place) {
