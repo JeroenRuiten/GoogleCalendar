@@ -12,7 +12,7 @@ function CacheStaticMaps($place) {
     $filename = hash("sha512", $place);
     $location = "cache/staticmaps/IMG-{$filename}.png";
     if(!file_exists($location)){
-        $mapsStaticLoc = str_replace('{place}', $place, 'http://maps.googleapis.com/maps/api/staticmap?center={place}&zoom=15&scale=false&size=600x300&maptype=roadmap&format=png&visual_refresh=true&markers=size:mid%7Ccolor:0xff0000%7Clabel:1%7C{place}');
+        $mapsStaticLoc = str_replace('{place}', $place, 'http://maps.googleapis.com/maps/api/staticmap?center={place}&zoom=15&scale=2&size=1000x350&maptype=roadmap&format=png&visual_refresh=true&markers=size:mid%7Ccolor:0xff0000%7Clabel:1%7C{place}');
         $file = file_get_contents($mapsStaticLoc);
         file_put_contents($location, $file);
     }
@@ -27,13 +27,18 @@ function GetMapsWidget($place) {
     $mapsPlace = str_replace(' ', '+', $place);
     $mapsStaticLoc = CacheStaticMaps($mapsPlace);
     $mapsLoc = str_replace('{place}', $mapsPlace, 'https://www.google.nl/maps/place/{place}');
+    //$template = "
+    //    <a target=\"_blank\" href=\"{$mapsLoc}\">
+    //        <figure>
+    //            <img src=\"{$mapsStaticLoc}\">
+    //            <figcaption>{$place}</figcaption>
+    //        </figure>
+    //    </a>
+    //";
     $template = "
-        <a target=\"_blank\" href=\"{$mapsLoc}\">
-            <figure>
-                <img src=\"{$mapsStaticLoc}\">
-                <figcaption>{$place}</figcaption>
-            </figure>
-        </a>
+        <header style=\"background-image: url({$mapsStaticLoc})\">
+            <div class=\"place\"><a target=\"_blank\" href=\"{$mapsLoc}\">{$place}</a></div>
+        </header>
     ";
     return $template;
 }
@@ -69,23 +74,37 @@ function FormatDatum($event) {
         $endDag = $dag[date('N', strtotime($event->end->date))];
         $endMaand = $maand[date('m', strtotime($event->end->date))];
         $endDatum = (int) date('d', strtotime($event->end->date));
-        return "<p>Van {$startDag} {$startDatum} {$startMaand} tot {$endDag} {$endDatum} {$endMaand}</p>";
+        //return "<p>Van {$startDag} {$startDatum} {$startMaand} tot {$endDag} {$endDatum} {$endMaand}</p>";
+        return "Van {$startDag} {$startDatum} {$startMaand} tot {$endDag} {$endDatum} {$endMaand}";
     } else {
-        return "<p>{$startDag} {$startDatum} {$startMaand}</p>";
+        //return "<p>{$startDag} {$startDatum} {$startMaand}</p>";
+        return "{$startDag} {$startDatum} {$startMaand}";
     }
 }
 
 function FormatEvent($event) {
+    //$template = "
+    //    <div class=\"event\">
+    //        <div>
+    //            <h3>{$event->summary}</h3>
+    //            <p>" . FormatDatum($event) . "</p>
+    //            <p>" . URL2Link(RemoveURL($event->description)) . "</p>
+    //            " . GetMapsWidget($event->location) . "
+    //        </div>
+    //        ". (!empty(GetURL($event->description)) ? "<a class=\"cta\" href=\"".GetURL($event->description)."\">More info</a>" : "") . "
+    //    </div>
+    //";
     $template = "
-        <div class=\"event\">
-            <div>
-                <h3>{$event->summary}</h3>
-                <p>" . FormatDatum($event) . "</p>
+        <section class=\"event\">
+            " . GetMapsWidget($event->location) . "
+            </header>
+            <main>
+                <p>" . (!empty(GetURL($event->description)) ? "<a class=\"cta\" href=\"" . GetURL($event->description) . "\">More info</a>" : "") . "</p>
+                <h2>" . FormatDatum($event) . "</h2>
+                <h1>{$event->summary}</h1>
                 <p>" . URL2Link(RemoveURL($event->description)) . "</p>
-                " . GetMapsWidget($event->location) . "
-            </div>
-            ". (!empty(GetURL($event->description)) ? "<a class=\"cta\" href=\"".GetURL($event->description)."\">More info</a>" : "") . "
-        </div>
+            </main>
+        </section>
     ";
     return $template;
 }
@@ -146,8 +165,8 @@ function RemoveURL($tekst)
         <link rel='shortcut icon' type='image/png' href='http://www.openhack.nl/openhack_binary_color_2.png'>
         
         <title>Open Hack - Hackathons in Nederland</title>
-        <link href='http://fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
-        <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+        <link href='//fonts.googleapis.com/css?family=Rokkitt' rel='stylesheet' type='text/css'>
+        <link href='//fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
         <link href="./css/reset.css" rel="stylesheet"/>
         <link href="./css/style.css" rel="stylesheet"/>
     </head>

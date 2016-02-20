@@ -9,7 +9,7 @@ html, body {
 header {
     text-align: center;
 }
-header div {
+.container > header div {
     display: inline-block;
     vertical-align: top;
     padding-top: 32px;
@@ -20,18 +20,6 @@ h1 {
     font-size: 4.8em;
     line-height: 1em;
 }
-h2 {
-    font-family: Roboto;
-    font-size: 2.4em;
-    line-height: 1.4em;
-    font-weight: 100;
-}
-h3 {
-    font-family: Rokkitt;
-    color: #f9ff4f;
-    font-size: 1.8em;
-    line-height: 1.4em;
-}
 header h2 {
     color: #f9ff4f;
 }
@@ -40,23 +28,6 @@ main h2 {
 }
 main p {
     line-height: 1.8em;
-}
-a {
-    display: inline-block;
-    border-radius: 2px;
-    text-decoration: none;
-    padding: .2em;
-    line-height: 1em;
-    background: #00ff00;
-    color: #1a1a1a;
-    font-weight: bold;
-    margin: 4px;
-    background: #333;
-    color: #fff;
-    font-weight: 100;
-}
-footer {
-    margin: 100px 0;
 }
 footer .social {
     text-align: right;
@@ -81,22 +52,69 @@ input {
     font-size: 1em;
 }
 .event {
-    padding: 10px;
-    margin: 20px 0;
+    margin: 20px 0 40px;
     background: #9e0a49;
 }
-.news {
-    padding: 10px;
-    margin: 20px 0;
-    background: #9e0a49;
+.event header {
+    height: 200px;
+    background-position: center center;
+    background-size: cover;
+    position: relative;
 }
-.cta {
+.event header .place {
+    background: black;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 0.4em;
+    opacity: 0.8;
+}
+.event header a {
+    text-decoration: none;
+    color: white;
+}
+.event main {
+    margin: 0.8em;
+    padding-bottom: 0.4em;
+}
+.event main h2 {
+    font-family: Rokkitt;
+    color: #f9ff4f;
+    font-size: 1.8em;
+    line-height: 1.2em;
+    padding-top: 0.2em;
+}
+.event main h1 {
+    font-family: Roboto;
+    font-size: 2.4em;
+    line-height: 1.2em;
+    font-weight: 100;
+    margin: 0.4em 0;
+}
+.event main a {
+    display: inline-block;
+    border-radius: 2px;
+    text-decoration: none;
+    padding: .2em;
+    line-height: 1em;
+    margin: 4px;
+    background: #39081d;
+    color: #fff;
+    font-weight: 100;
+}
+.event main a.cta {
     margin: 20px;
     font-size: 1.4em;
     background: #f9ff4f;
     padding: 10px;
     color: #1a1a1a;
     border: 0;
+    float: right;
+}
+.news {
+    padding: 10px;
+    margin: 20px 0;
+    background: #9e0a49;
 }
 .container {
     max-width: 800px;
