@@ -10,7 +10,13 @@ foreach ($data->items as $event) {
 
 function CacheStaticMaps($place) {
     $filename = hash("sha512", $place);
-    $location = "cache/staticmaps/IMG-{$filename}.png";
+    $dir = "cache/staticmaps";
+    $location = "{$dir}/IMG-{$filename}.png";
+    
+    if (!file_exists($dir)) {
+        mkdir($dir, 0755, true);
+    }
+    
     if(!file_exists($location)){
         $mapsStaticLoc = str_replace('{place}', $place, 'http://maps.googleapis.com/maps/api/staticmap?center={place}&zoom=15&scale=2&size=1000x350&maptype=roadmap&format=png&visual_refresh=true&markers=size:mid%7Ccolor:0xff0000%7Clabel:1%7C{place}');
         $file = file_get_contents($mapsStaticLoc);
