@@ -1,29 +1,48 @@
 <?php
 
-$apiUrl = "http://api.openhack.nl";
-$jsonData = file_get_contents($apiUrl);
-$data = json_decode($jsonData);
-foreach ($data->items as $event) {
-    if ($event->start->dateTime) $event->start->date = date('Y-m-d', strtotime($event->start->dateTime));
-    if ($event->end->dateTime) $event->end->date = date('Y-m-d', strtotime($event->end->dateTime));
-}
+//global avalible data object
+$data = GetJson();
+
+function GetJson() {
+    $apiUrl = "http://api.openhack.nl";
+    $filename = "calendar.json";
+    
+    //read from cache, not older than one day
+    if(!file_exists($filename) || (time() - (24 * 60 * 60)) > filemtime($filename)) {
+        $jsonData = file_get_contents($apiUrl);
+        file_put_contents($filename, $jsonData);
+    } else {
+        $jsonData = file_get_contents($filename);
+    }
+    
+    //json => object and put date to every object
+    $data = json_decode($jsonData);
+    foreach ($data->items as $event) {
+        if ($event->start->dateTime) $event->start->date = date('Y-m-d', strtotime($event->start->dateTime));
+        if ($event->end->dateTime) $event->end->date = date('Y-m-d', strtotime($event->end->dateTime));
+    }
+    
+    return $data;
+}//GetJson
 
 function CacheStaticMaps($place) {
     $filename = hash("sha512", $place);
     $dir = "cache/staticmaps";
     $location = "{$dir}/IMG-{$filename}.png";
     
+    //make dir
     if (!file_exists($dir)) {
         mkdir($dir, 0755, true);
     }
     
-    if(!file_exists($location)){
+    //read from cache, not older than one year
+    if(!file_exists($location) || (time() - (365 * 7 * 24 * 60 * 60)) > filemtime($location)){
         $mapsStaticLoc = str_replace('{place}', $place, 'http://maps.googleapis.com/maps/api/staticmap?center={place}&zoom=15&scale=2&size=1000x350&maptype=roadmap&format=png&visual_refresh=true&markers=size:mid%7Ccolor:0xff0000%7Clabel:1%7C{place}');
         $file = file_get_contents($mapsStaticLoc);
         file_put_contents($location, $file);
     }
     return $location;
-}
+}//CacheStaticMaps
 
 function GetMapsWidget($place) {
     if(empty($place)){
@@ -47,7 +66,7 @@ function GetMapsWidget($place) {
         </header>
     ";
     return $template;
-}
+}//GetMapsWidget
 
 function FormatDatum($event) {
     $dag = ([
@@ -86,7 +105,7 @@ function FormatDatum($event) {
         //return "<p>{$startDag} {$startDatum} {$startMaand}</p>";
         return "{$startDag} {$startDatum} {$startMaand}";
     }
-}
+}//FormatDatum
 
 function FormatEvent($event) {
     //$template = "
@@ -113,7 +132,7 @@ function FormatEvent($event) {
         </section>
     ";
     return $template;
-}
+}//FormatEvent
 
 //Vervang url door link
 function URL2Link($tekst)
