@@ -84,7 +84,7 @@ function FormatEvent($event) {
                 <p>" . URL2Link(RemoveURL($event->description)) . "</p>
                 " . GetMapsWidget($event->location) . "
             </div>
-            ". (!empty(GetURL($datum->description)) ? "<a class=\"cta\" href=\"" . GetURL($datum->description) . ">More info</a>" : "") . "
+            ". (!empty(GetURL($event->description)) ? "<a class=\"cta\" href=\"".GetURL($event->description)."\">More info</a>" : "") . "
         </div>
     ";
     return $template;
@@ -107,7 +107,7 @@ function URL2Link($tekst)
 function GetURL($tekst)
 {
     // The Regular Expression filter
-    $reg_exUrl = "/\((url\:)(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?\)/";
+    $reg_exUrl = "/\((url\:)(http|https|ftp|ftps)\:\/\/([a-zA-Z0-9\-\.]+\.)[a-zA-Z]+(\/\S*)?\)/";
     
     // Check if there is a url in the text
     if(preg_match($reg_exUrl, $tekst, $url)) {
