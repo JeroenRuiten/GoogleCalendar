@@ -3,9 +3,16 @@
 //global avalible data object
 $data = GetJson();
 
+//Get Json local or remote if old. Broken cache never overrides good old cache
 function GetJson() {
     $apiUrl = "http://api.openhack.nl";
-    $filename = "calendar.json";
+    $dir = "cache";
+    $filename = "{$dir}/calendar.json";
+    
+    //make dir
+    if (!file_exists($dir)) {
+        mkdir($dir, 0755, true);
+    }
     
     //read from cache, not older than one day
     if(!file_exists($filename) || (time() - (24 * 60 * 60)) > filemtime($filename)) {
@@ -17,9 +24,21 @@ function GetJson() {
             if ($event->start->dateTime) $event->start->date = date('Y-m-d', strtotime($event->start->dateTime));
             if ($event->end->dateTime) $event->end->date = date('Y-m-d', strtotime($event->end->dateTime));
         }
-        $jsonData = json_encode($data);
+        $data->cacheReason = 'Old cache or non existing';
         
-        file_put_contents($filename, $jsonData);
+        //Is new stream broken?
+        if($data->kind !== "calendar#events") {
+            $jsonData = file_get_contents($filename);
+            $data = json_decode($jsonData);
+            $data->cacheReason = 'Cache stream broken, using old cache';
+            $jsonData = json_encode($data);
+            file_put_contents($filename, $jsonData);
+            
+        } else {
+            $data->cacheTimeStamp = time();
+            $jsonData = json_encode($data);
+            file_put_contents($filename, $jsonData);
+        }
         
     } else {
         $jsonData = file_get_contents($filename);
@@ -40,7 +59,7 @@ function CacheStaticMaps($place) {
     
     //read from cache, not older than one year
     if(!file_exists($location) || (time() - (365 * 7 * 24 * 60 * 60)) > filemtime($location)){
-        $mapsStaticLoc = str_replace('{place}', $place, 'http://maps.googleapis.com/maps/api/staticmap?center={place}&zoom=15&scale=2&size=1000x350&maptype=roadmap&format=png&visual_refresh=true&markers=size:mid%7Ccolor:0xff0000%7Clabel:1%7C{place}');
+        $mapsStaticLoc = str_replace('{place}', $place, 'http://maps.googleapis.com/maps/api/staticmap?center={place}&zoom=15&scale=2&size=800x200&maptype=roadmap&format=png&visual_refresh=true&markers=size:mid%7Ccolor:0xff0000%7Clabel:1%7C{place}');
         $file = file_get_contents($mapsStaticLoc);
         file_put_contents($location, $file);
     }
@@ -183,6 +202,8 @@ function RemoveURL($tekst)
 }//RemoveURL
 ?>
 <!DOCTYPE html>
+<?= '<!-- Json Cache Timestamp: '.$data->cacheTimeStamp.' -->'."\n" ?>
+<?= '<!-- Cache reason: '.$data->cacheReason.' -->'."\n" ?>
 <html>
     <head>
         <meta name='viewport' content='width=320,initial-scale=1,user-scalable=0'>
