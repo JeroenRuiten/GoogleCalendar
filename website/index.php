@@ -202,7 +202,7 @@ function RemoveURL($tekst)
 }//RemoveURL
 ?>
 <!DOCTYPE html>
-<?= '<!-- Json Cache Timestamp: '.$data->cacheTimeStamp.' -->'."\n" ?>
+<?= '<!-- Json Cache create date: '.date("c", $data->cacheTimeStamp).' -->'."\n" ?>
 <?= '<!-- Cache reason: '.$data->cacheReason.' -->'."\n" ?>
 <html>
     <head>
